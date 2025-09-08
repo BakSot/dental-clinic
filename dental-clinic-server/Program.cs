@@ -161,6 +161,9 @@ app.MapPost("/appointments", async (Appointment appointment, AppDbContext db) =>
 
 app.MapGet("/appointments/options", async (AppDbContext db) =>
 {
+    // Define clinic dentists (could later come from DB)
+    var clinicDentists = new List<string> { "Dr. John", "Dr. Jane", "Dr. Smith" };
+
     // Define treatments (could later come from DB)
     var treatments = new[]
     {
@@ -170,41 +173,31 @@ app.MapGet("/appointments/options", async (AppDbContext db) =>
         new { Name = "Checkup", Duration = 20 },
     };
 
-    // Define dentists (could later come from DB)
-    var dentists = await db.Patients
-        .SelectMany(p => p.Appointments.Select(a => a.Dentist)) // gather existing dentists
-        .Distinct()
-        .ToListAsync();
-
-    // If no appointments exist yet, provide default dentists
-    if (!dentists.Any())
-    {
-        dentists = new List<string> { "Dr. John", "Dr. Jane", "Dr. Smith" };
-    }
-
-    // Fetch appointments to calculate dentist availability
+    // Fetch all appointments
     var appointments = await db.Appointments
-        .Select(a => new
-        {
-            a.Dentist,
-            a.DateTime,
-            a.Duration
-        })
+        .Select(a => new { a.Dentist, a.DateTime, a.Duration })
         .ToListAsync();
 
-    var dentistAvailability = dentists.ToDictionary(
+    // Merge dentists from appointments into the default list
+    var allDentists = clinicDentists
+        .Union(appointments.Select(a => a.Dentist))
+        .Distinct()
+        .ToList();
+
+    // Map availability per dentist
+    var dentistAppointments = allDentists.ToDictionary(
         d => d,
         d => appointments
-            .Where(a => a.Dentist == d)
-            .Select(a => new { a.DateTime, a.Duration })
-            .ToList()
+                .Where(a => a.Dentist == d)
+                .Select(a => new { a.DateTime, a.Duration })
+                .ToList()
     );
 
     return Results.Ok(new
     {
-        Dentists = dentists,
-        Treatments = treatments,
-        Availability = dentistAvailability
+        dentists = allDentists,   // Always all dentists
+        treatments = treatments.Select(t => new { name = t.Name, duration = t.Duration }),
+        appointments = dentistAppointments
     });
 });
 

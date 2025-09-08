@@ -33,3 +33,4 @@ C:\Users\v-sbakas\msps\dental-clinic-server\obj\Debug\net8.0\refint\DentalPms.dl
 C:\Users\v-sbakas\msps\dental-clinic-server\obj\Debug\net8.0\DentalPms.pdb
 C:\Users\v-sbakas\msps\dental-clinic-server\obj\Debug\net8.0\DentalPms.genruntimeconfig.cache
 C:\Users\v-sbakas\msps\dental-clinic-server\obj\Debug\net8.0\ref\DentalPms.dll
+C:\Users\v-sbakas\msps\dental-clinic-server\obj\Debug\net8.0\DentalPms.sourcelink.json

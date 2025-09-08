@@ -1,3 +1,4 @@
+// AppointmentForm.tsx
 import {
   Dialog,
   DialogTitle,
@@ -6,35 +7,31 @@ import {
   Button,
   TextField,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import dayjs, { Dayjs } from "dayjs";
 import { useCreateAppointment } from "../hooks/useAppointments";
-import { useQuery } from "@tanstack/react-query";
+import {
+  useAppointmentOptions,
+  type DentistAvailability,
+} from "../hooks/useAppointmentOptions";
+import { useMemo } from "react";
 
 type AppointmentFormProps = {
   open: boolean;
   onClose: () => void;
   patientId: number;
-  onSuccess?: () => void; // optional callback
+  onSuccess?: () => void;
 };
 
 type FormValues = {
   dateTime: Dayjs | null;
   dentist: string;
-  treatment: string; // only treatment name is stored in the form
+  treatment: string;
   duration: number;
 };
-
-const dentists = ["Dr. John", "Dr. Jane", "Dr. Smith"];
-
-const treatments = [
-  { name: "Cleaning", duration: 30 },
-  { name: "Filling", duration: 45 },
-  { name: "Extraction", duration: 60 },
-  { name: "Checkup", duration: 20 },
-];
 
 const AppointmentForm = ({
   open,
@@ -43,37 +40,63 @@ const AppointmentForm = ({
   onSuccess,
 }: AppointmentFormProps) => {
   const { control, handleSubmit, reset } = useForm<FormValues>({
-    defaultValues: {
-      dateTime: null,
-      dentist: "",
-      treatment: "",
-    },
+    defaultValues: { dateTime: null, dentist: "", treatment: "" },
   });
 
   const mutation = useCreateAppointment(patientId);
 
+  // Fetch options when dialog is open
+  const { data: options, isLoading, isError } = useAppointmentOptions(open);
+ 
+  const selectedDateTime = useWatch({ control, name: "dateTime" });
+
+  const availableDentists: string[] = useMemo(() => {
+    if (!options) return [];
+    if (!selectedDateTime) return options?.dentists;
+
+    return options.dentists.filter((d) => {
+      const appointments: DentistAvailability[] =
+        options?.appointments[d] ?? [];
+      if (appointments?.length === 0) return true; // no appointments => available
+
+      const selected = selectedDateTime?.toDate().getTime();
+      if (!selected) return true;
+
+      return !appointments?.some((a) => {
+        const start = new Date(a.dateTime).getTime();
+        const end = start + a.duration * 60 * 1000;
+        const selected = selectedDateTime?.toDate().getTime();
+        return selected >= start && selected < end;
+      });
+    });
+  }, [options, selectedDateTime]);
+
   const onSubmit = (data: FormValues) => {
-    const selectedTreatment = treatments.find((t) => t.name === data.treatment);
+    if (!options) return;
+
+    const selectedTreatment = options.treatments.find(
+      (t) => t.name === data.treatment
+    );
 
     mutation.mutate(
       {
-        dateTime: data.dateTime ? data.dateTime.toISOString() : null,
+        dateTime: data.dateTime?.toISOString() ?? null,
         dentist: data.dentist,
         treatment: data.treatment,
-        duration: selectedTreatment?.duration ?? 30, // pass duration too
+        duration: selectedTreatment?.duration ?? 30,
       },
       {
         onSuccess: () => {
           reset();
           onClose();
-          if (onSuccess) onSuccess(); // trigger external callback if provided
+          onSuccess?.();
         },
       }
     );
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>Add Appointment</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
@@ -81,13 +104,22 @@ const AppointmentForm = ({
           <Controller
             name="dateTime"
             control={control}
-            render={({ field }) => (
+            rules={{ required: "Please select date & time" }}
+            render={({ field, fieldState }) => (
               <DateTimePicker
                 label="Date & Time"
-                value={field.value}
-                onChange={field.onChange}
+                {...field}
+                value={field.value ?? null}
+                onChange={(value) => field.onChange(value ?? null)} //
                 minDateTime={dayjs()}
-                slotProps={{ textField: { fullWidth: true, margin: "normal" } }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    margin: "normal",
+                    error: !!fieldState.error,
+                    helperText: fieldState.error?.message,
+                  },
+                }}
               />
             )}
           />
@@ -107,11 +139,21 @@ const AppointmentForm = ({
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
               >
-                {dentists.map((d) => (
-                  <MenuItem key={d} value={d}>
-                    {d}
+                {isLoading ? (
+                  <MenuItem disabled>
+                    <CircularProgress size={20} /> Loading...
                   </MenuItem>
-                ))}
+                ) : isError ? (
+                  <MenuItem disabled>Error loading dentists</MenuItem>
+                ) : availableDentists.length === 0 ? (
+                  <MenuItem disabled>No available dentists</MenuItem>
+                ) : (
+                  availableDentists.map((d) => (
+                    <MenuItem key={d} value={d}>
+                      {d}
+                    </MenuItem>
+                  ))
+                )}
               </TextField>
             )}
           />
@@ -120,19 +162,32 @@ const AppointmentForm = ({
           <Controller
             name="treatment"
             control={control}
-            render={({ field }) => (
+            rules={{ required: "Please select a treatment" }}
+            render={({ field, fieldState }) => (
               <TextField
                 {...field}
                 label="Treatment"
                 fullWidth
                 margin="normal"
                 select
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
               >
-                {treatments.map((t) => (
-                  <MenuItem key={t.name} value={t.name}>
-                    {t.name} ({t.duration} min)
+                {isLoading ? (
+                  <MenuItem disabled>
+                    <CircularProgress size={20} /> Loading...
                   </MenuItem>
-                ))}
+                ) : isError ? (
+                  <MenuItem disabled>Error loading treatments</MenuItem>
+                ) : options?.treatments.length === 0 ? (
+                  <MenuItem disabled>No treatments available</MenuItem>
+                ) : (
+                  options?.treatments.map((t) => (
+                    <MenuItem key={t.name} value={t.name}>
+                      {t.name} ({t.duration} min)
+                    </MenuItem>
+                  ))
+                )}
               </TextField>
             )}
           />

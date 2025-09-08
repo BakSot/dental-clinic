@@ -7,7 +7,9 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
+  Box,
 } from "@mui/material";
+import LinearProgress from "@mui/material/LinearProgress";
 import PatientForm from "../components/PatientForm";
 import { usePatients } from "../hooks/usePatients";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +19,25 @@ export default function PatientsPage() {
   const { data: patients = [], isLoading } = usePatients();
   const navigate = useNavigate();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center", // vertical centering
+          justifyContent: "center", // horizontal centering
+          width: "100vw",
+          height: "100vh", // full viewport height
+          position: "fixed", // keep it on top
+          top: 0,
+          left: 0,
+          zIndex: 1300, // above other content
+          backgroundColor: "rgba(255,255,255,0.7)", // optional overlay
+        }}
+      >
+        <LinearProgress sx={{ width: "50%" }} />
+      </Box>
+    );
 
   return (
     <Container>
@@ -27,6 +47,7 @@ export default function PatientsPage() {
       <Button variant="contained" onClick={() => setOpen(true)} sx={{ mb: 2 }}>
         Create New Patient
       </Button>
+      
 
       <List>
         {patients.map((p) => (
