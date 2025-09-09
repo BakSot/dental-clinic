@@ -18,6 +18,7 @@ import {
   type DentistAvailability,
 } from "../hooks/useAppointmentOptions";
 import { useMemo } from "react";
+import { CreateNewPatientButton } from "../pages/styled";
 
 type AppointmentFormProps = {
   open: boolean;
@@ -47,7 +48,7 @@ const AppointmentForm = ({
 
   // Fetch options when dialog is open
   const { data: options, isLoading, isError } = useAppointmentOptions(open);
- 
+
   const selectedDateTime = useWatch({ control, name: "dateTime" });
 
   const availableDentists: string[] = useMemo(() => {
@@ -194,14 +195,16 @@ const AppointmentForm = ({
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button
+          <Button onClick={onClose} sx={{ color: "#006338" }}>
+            Cancel
+          </Button>
+          <CreateNewPatientButton
             type="submit"
             variant="contained"
             disabled={mutation.isPending}
           >
             Save
-          </Button>
+          </CreateNewPatientButton>
         </DialogActions>
       </form>
     </Dialog>

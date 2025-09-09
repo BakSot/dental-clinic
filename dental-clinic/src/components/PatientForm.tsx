@@ -1,15 +1,15 @@
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller } from "react-hook-form";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
-  Button,
-} from '@mui/material';
-import { useCreatePatient } from '../hooks/usePatients';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+} from "@mui/material";
+import { useCreatePatient } from "../hooks/usePatients";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { PatientFormButton } from "./styled";
 
 type PatientFormData = {
   fullName: string;
@@ -32,7 +32,7 @@ export default function PatientForm({ open, onClose }: Props) {
     try {
       const patient = await createPatientMutation.mutateAsync({
         ...data,
-        photoUrl: filePreview || '',
+        photoUrl: filePreview || "",
       });
 
       reset();
@@ -61,7 +61,7 @@ export default function PatientForm({ open, onClose }: Props) {
             name="fullName"
             control={control}
             defaultValue=""
-            rules={{ required: 'Full Name is required' }}
+            rules={{ required: "Full Name is required" }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
@@ -77,7 +77,7 @@ export default function PatientForm({ open, onClose }: Props) {
             name="address"
             control={control}
             defaultValue=""
-            rules={{ required: 'Address is required' }}
+            rules={{ required: "Address is required" }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
@@ -89,7 +89,7 @@ export default function PatientForm({ open, onClose }: Props) {
               />
             )}
           />
-          <Button variant="contained" component="label" sx={{ mt: 2 }}>
+          <PatientFormButton variant="contained" component="label">
             Upload Photo
             <input
               type="file"
@@ -97,21 +97,27 @@ export default function PatientForm({ open, onClose }: Props) {
               accept="image/*"
               onChange={handleFileChange}
             />
-          </Button>
+          </PatientFormButton>
           {filePreview && (
             <img
               src={filePreview}
               alt="Preview"
-              style={{ width: 100, marginTop: 10, display: 'block' }}
+              style={{ width: 100, marginTop: 10, display: "block" }}
             />
           )}
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button type="submit" form="patient-form" variant="contained">
+        <PatientFormButton variant="contained" onClick={onClose}>
+          Cancel
+        </PatientFormButton>
+        <PatientFormButton
+          type="submit"
+          form="patient-form"
+          variant="contained"
+        >
           Create
-        </Button>
+        </PatientFormButton>
       </DialogActions>
     </Dialog>
   );

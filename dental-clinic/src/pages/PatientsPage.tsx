@@ -1,18 +1,22 @@
 import { useState } from "react";
 import {
-  Button,
-  Container,
   Typography,
   List,
   ListItem,
   ListItemText,
   ListItemButton,
-  Box,
+  Avatar,
 } from "@mui/material";
-import LinearProgress from "@mui/material/LinearProgress";
 import PatientForm from "../components/PatientForm";
 import { usePatients } from "../hooks/usePatients";
 import { useNavigate } from "react-router-dom";
+import {
+  CreateNewPatientButton,
+  PatientAvatar,
+  PatientPageContainer,
+  PatientPageLinearProgress,
+  PatientsPageBox,
+} from "./styled";
 
 export default function PatientsPage() {
   const [open, setOpen] = useState(false);
@@ -21,38 +25,25 @@ export default function PatientsPage() {
 
   if (isLoading)
     return (
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center", // vertical centering
-          justifyContent: "center", // horizontal centering
-          width: "100vw",
-          height: "100vh", // full viewport height
-          position: "fixed", // keep it on top
-          top: 0,
-          left: 0,
-          zIndex: 1300, // above other content
-          backgroundColor: "rgba(255,255,255,0.7)", // optional overlay
-        }}
-      >
-        <LinearProgress sx={{ width: "50%" }} />
-      </Box>
+      <PatientsPageBox>
+        <PatientPageLinearProgress />
+      </PatientsPageBox>
     );
 
   return (
-    <Container>
+    <PatientPageContainer>
       <Typography variant="h4" gutterBottom>
         Patients
       </Typography>
-      <Button variant="contained" onClick={() => setOpen(true)} sx={{ mb: 2 }}>
+      <CreateNewPatientButton variant="contained" onClick={() => setOpen(true)}>
         Create New Patient
-      </Button>
-      
+      </CreateNewPatientButton>
 
       <List>
         {patients.map((p) => (
           <ListItem key={p.id}>
             <ListItemButton onClick={() => navigate(`/patients/${p.id}`)}>
+              <PatientAvatar alt={p.fullName} src={p?.photoUrl} />
               <ListItemText primary={p.fullName} secondary={p.address} />
             </ListItemButton>
           </ListItem>
@@ -60,6 +51,6 @@ export default function PatientsPage() {
       </List>
 
       <PatientForm open={open} onClose={() => setOpen(false)} />
-    </Container>
+    </PatientPageContainer>
   );
 }

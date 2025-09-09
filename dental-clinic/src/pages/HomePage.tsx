@@ -1,35 +1,39 @@
-import { Container, Typography, Button, Box } from "@mui/material";
+import { Typography, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { HomePageBox, HomePageBoxWrappper, HomePageButton, HomePageContainer } from "./styled";
 
 const HomePage = () => {
   const navigate = useNavigate();
 
   return (
-    <Container sx={{ textAlign: "center", mt: 6 }}>
-      <Typography variant="h4" gutterBottom>
-        Welcome to the Dental Clinic
-      </Typography>
-      <Typography variant="subtitle1" gutterBottom>
-        Manage patients and appointments with ease
-      </Typography>
-      <Box sx={{ mt: 4 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ mr: 2 }}
-          onClick={() => navigate("/patients")}
-        >
-          View Patients
-        </Button>
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={() => navigate("/appointments")}
-        >
-          View Appointments
-        </Button>
-      </Box>
-    </Container>
+    <Box>
+      {/* Hero section with background image */}
+      <HomePageBoxWrappper>
+        <HomePageContainer>
+          <Typography variant="h3" gutterBottom>
+            Welcome to the Dental Clinic
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            Manage patients and appointments with ease
+          </Typography>
+          <HomePageBox>
+            <HomePageButton
+              variant="contained"
+              onClick={() => navigate("/patients")}
+            >
+              View Patients
+            </HomePageButton>
+            <Button
+              variant="outlined"
+              color="inherit"
+              onClick={() => navigate("/appointments")}
+            >
+              View Appointments
+            </Button>
+          </HomePageBox>
+        </HomePageContainer>
+      </HomePageBoxWrappper>
+    </Box>
   );
 };
 

@@ -4,18 +4,20 @@ import { usePatient } from "../hooks/usePatients";
 import {
   Container,
   Typography,
-  Card,
   CardContent,
-  CardMedia,
   List,
   ListItem,
   ListItemText,
   CircularProgress,
-  Fab,
 } from "@mui/material";
 import AppointmentForm from "../components/AppointmentForm";
 import AddIcon from "@mui/icons-material/Add";
 import dayjs from "dayjs";
+import {
+  PatientDetailsPageFab,
+  PatientImage,
+  PatientsDetailsCard,
+} from "./styled";
 
 const PatientDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,20 +48,19 @@ const PatientDetailsPage = () => {
         Patient Details
       </Typography>
 
-      <Card sx={{ display: "flex", mb: 4 }}>
+      <PatientsDetailsCard>
         {patient?.photoUrl && (
-          <CardMedia
+          <PatientImage
             component="img"
-            sx={{ width: 150 }}
-            image={patient.photoUrl}
-            alt={patient.fullName}
+            image={patient?.photoUrl}
+            // alt={patient?.fullName}
           />
         )}
         <CardContent>
           <Typography variant="h5">{patient?.fullName}</Typography>
           <Typography variant="body1">{patient?.address}</Typography>
         </CardContent>
-      </Card>
+      </PatientsDetailsCard>
 
       <Typography variant="h5" gutterBottom>
         Appointments
@@ -90,13 +91,9 @@ const PatientDetailsPage = () => {
         </List>
       )}
 
-      <Fab
-        color="primary"
-        sx={{ position: "fixed", bottom: 24, right: 24 }}
-        onClick={() => setOpen(true)}
-      >
+      <PatientDetailsPageFab onClick={() => setOpen(true)}>
         <AddIcon />
-      </Fab>
+      </PatientDetailsPageFab>
 
       {/* Appointment Form Dialog */}
       <AppointmentForm

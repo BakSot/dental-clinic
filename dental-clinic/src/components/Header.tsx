@@ -1,18 +1,12 @@
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
+import { HeaderBox } from "./styled";
 
 const Header = () => {
   return (
-    <Box
-      sx={{
-        bgcolor: "primary.main",
-        color: "white",
-        py: 4,
-        textAlign: "center",
-      }}
-    >
+    <HeaderBox>
       <Typography variant="h3">Dental Clinic</Typography>
       <Typography variant="subtitle1">Your smile, our priority</Typography>
-    </Box>
+    </HeaderBox>
   );
 };
 

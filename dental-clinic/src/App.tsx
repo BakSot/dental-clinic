@@ -17,7 +17,7 @@ const App = () => {
           minHeight: "100vh", // makes footer stick to bottom
         }}
       >
-        <Header />
+        {/* <Header /> */}
         <NavBar />
         <Routes>
           <Route path="/" element={<HomePage />} />
