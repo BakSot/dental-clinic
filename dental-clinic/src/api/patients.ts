@@ -1,19 +1,4 @@
-export type Appointment = {
-  id: number;
-  patientId: number;
-  dateTime: string | null;
-  dentist: string;
-  treatment: string;
-  duration: number;
-};
-
-export type Patient = {
-  id: number;
-  fullName: string;
-  address: string;
-  photoUrl?: string;
-  appointments: Appointment[];
-};
+import type { Appointment, Patient } from "../hooks/types";
 
 const BASE_URL = "http://localhost:5161"; // your backend URL
 

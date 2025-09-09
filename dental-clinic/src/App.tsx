@@ -1,23 +1,21 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PatientsPage from "./pages/PatientsPage";
 import PatientDetailsPage from "./pages/PatientDetailsPage";
-import { Box } from "@mui/material";
-import Header from "./components/Header";
-import NavBar from "./components/NavBar";
-import Footer from "./components/Footer";
+import { Box, styled } from "@mui/material";
 import HomePage from "./pages/HomePage";
+import NavBar from "./components/common/NavBar";
+import Footer from "./components/common/Footer";
+
+const AppBox = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+  minHeight: "100vh",
+});
 
 const App = () => {
   return (
     <Router>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "100vh", // makes footer stick to bottom
-        }}
-      >
-        {/* <Header /> */}
+      <AppBox>
         <NavBar />
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -25,7 +23,7 @@ const App = () => {
           <Route path="/patients/:id" element={<PatientDetailsPage />} />
         </Routes>
         <Footer />
-      </Box>
+      </AppBox>
     </Router>
   );
 };

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createPatient, getAllPatients, getPatient, type Patient } from '../api/patients';
+import { createPatient, getAllPatients, getPatient } from '../api/patients';
+import type { Patient } from './types';
 
 export const usePatients = () =>
   useQuery<Patient[]>({

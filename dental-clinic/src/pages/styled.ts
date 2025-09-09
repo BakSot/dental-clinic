@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardMedia,
+  CircularProgress,
   Container,
   Fab,
   LinearProgress,
@@ -26,6 +27,7 @@ export const PatientsPageBox = styled(Box)({
 
 export const PatientPageLinearProgress = styled(LinearProgress)({
   width: "50%",
+  backgroundColor: "#006338",
 });
 
 export const CreateNewPatientButton = styled(Button)({
@@ -85,4 +87,8 @@ export const HomePageBox = styled(Box)({
 export const HomePageButton = styled(Button)({
   mr: 2,
   backgroundColor: "#006338",
+});
+
+export const StyledCircularProgress = styled(CircularProgress)({
+  color: "#006338",
 });

@@ -1,101 +1,39 @@
 import { useState } from "react";
-import { useParams } from "react-router";
-import { usePatient } from "../hooks/usePatients";
-import {
-  Container,
-  Typography,
-  CardContent,
-  List,
-  ListItem,
-  ListItemText,
-  CircularProgress,
-} from "@mui/material";
-import AppointmentForm from "../components/AppointmentForm";
+import { Container, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import dayjs from "dayjs";
-import {
-  PatientDetailsPageFab,
-  PatientImage,
-  PatientsDetailsCard,
-} from "./styled";
+import { usePatientDetails } from "../hooks/usePatientDetails";
+import AppointmentForm from "../components/Appointments/AppointmentForm";
+import { PatientDetailsPageFab } from "./styled";
+import { PageError, PageLoader } from "../components/common/utils";
+import { PatientInfoCard } from "../components/Patients/PatientsDetailsCard";
+import { AppointmentsList } from "../components/Appointments/AppointmentsList";
 
 const PatientDetailsPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const patientId = Number(id);
-  const { data: patient, isLoading, isError, error } = usePatient(patientId);
-
+  const { patientId, patient, isLoading, isError, error } = usePatientDetails();
   const [open, setOpen] = useState(false);
 
-  if (isLoading)
-    return (
-      <Container>
-        <CircularProgress />
-      </Container>
-    );
-
-  if (isError)
-    return (
-      <Container>
-        <Typography color="error">Error: {(error as Error).message}</Typography>
-      </Container>
-    );
-
+  if (isLoading) return <PageLoader />;
+  if (isError) return <PageError message={(error as Error).message} />;
   if (!patient) return null;
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom pt={"20px"}>
         Patient Details
       </Typography>
 
-      <PatientsDetailsCard>
-        {patient?.photoUrl && (
-          <PatientImage
-            component="img"
-            image={patient?.photoUrl}
-            // alt={patient?.fullName}
-          />
-        )}
-        <CardContent>
-          <Typography variant="h5">{patient?.fullName}</Typography>
-          <Typography variant="body1">{patient?.address}</Typography>
-        </CardContent>
-      </PatientsDetailsCard>
+      <PatientInfoCard patient={patient} />
 
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h5" gutterBottom pt={"20px"}>
         Appointments
       </Typography>
 
-      {patient?.appointments.length === 0 ? (
-        <Typography>No appointments yet.</Typography>
-      ) : (
-        <List>
-          {patient?.appointments.map((a) => {
-            const start = dayjs(a.dateTime);
-            const end = a.duration ? start.add(a.duration, "minute") : null;
-            return (
-              <ListItem key={a.id}>
-                <ListItemText
-                  primary={`${a.treatment} with ${a.dentist}`}
-                  secondary={
-                    end
-                      ? `${start.format("DD/MM/YYYY")}  ${start.format(
-                          "HH:mm"
-                        )} – ${end.format("HH:mm")}`
-                      : start.format("DD/MM/YYYY HH:mm")
-                  }
-                />
-              </ListItem>
-            );
-          })}
-        </List>
-      )}
+      <AppointmentsList appointments={patient.appointments} />
 
       <PatientDetailsPageFab onClick={() => setOpen(true)}>
         <AddIcon />
       </PatientDetailsPageFab>
 
-      {/* Appointment Form Dialog */}
       <AppointmentForm
         open={open}
         onClose={() => setOpen(false)}

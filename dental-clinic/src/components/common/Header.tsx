@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import { HeaderBox } from "./styled";
+import { HeaderBox } from "../styled";
 
 const Header = () => {
   return (

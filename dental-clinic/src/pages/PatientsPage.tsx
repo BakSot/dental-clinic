@@ -1,27 +1,18 @@
-import { useState } from "react";
-import {
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemButton,
-  Avatar,
-} from "@mui/material";
-import PatientForm from "../components/PatientForm";
+import { Typography } from "@mui/material";
 import { usePatients } from "../hooks/usePatients";
-import { useNavigate } from "react-router-dom";
 import {
   CreateNewPatientButton,
-  PatientAvatar,
   PatientPageContainer,
   PatientPageLinearProgress,
   PatientsPageBox,
 } from "./styled";
+import PatientForm from "../components/Patients/PatientForm";
+import { useState } from "react";
+import PatientList from "../components/Patients/PatientList";
 
-export default function PatientsPage() {
+const PatientsPage = () => {
   const [open, setOpen] = useState(false);
   const { data: patients = [], isLoading } = usePatients();
-  const navigate = useNavigate();
 
   if (isLoading)
     return (
@@ -32,25 +23,16 @@ export default function PatientsPage() {
 
   return (
     <PatientPageContainer>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom pt={"20px"}>
         Patients
       </Typography>
       <CreateNewPatientButton variant="contained" onClick={() => setOpen(true)}>
         Create New Patient
       </CreateNewPatientButton>
-
-      <List>
-        {patients.map((p) => (
-          <ListItem key={p.id}>
-            <ListItemButton onClick={() => navigate(`/patients/${p.id}`)}>
-              <PatientAvatar alt={p.fullName} src={p?.photoUrl} />
-              <ListItemText primary={p.fullName} secondary={p.address} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-
+      <PatientList patients={patients} />
       <PatientForm open={open} onClose={() => setOpen(false)} />
     </PatientPageContainer>
   );
-}
+};
+
+export default PatientsPage;

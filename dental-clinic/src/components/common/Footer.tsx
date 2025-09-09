@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import { FooterBox } from "./styled";
+import { FooterBox } from "../styled";
 
 const Footer = () => {
   return (
